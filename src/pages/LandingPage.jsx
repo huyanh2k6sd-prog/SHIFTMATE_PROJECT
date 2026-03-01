@@ -505,7 +505,7 @@ const rawHTML = `<style>
 <span class="font-semibold">📞 Phone:</span> +84 353636592
                             </li>
 <li class="flex items-center gap-2">
-<span class="font-semibold">🌐 Website:</span> https://shiftmate.vercel.app/
+<span class="font-semibold">🌐 Website:</span> <a href="https://shiftmate.vercel.app/" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">https://shiftmate.vercel.app/</a>
                             </li>
 </ul>
 </div>
