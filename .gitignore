@@ -1,0 +1,42 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Temporary files
+/tmp
+*.tmp
+*.bak
+*.temp
+out.html
+errors*.txt
+build_*.txt
+*.js
+!src/**/*.js
+!supabase/**/*.js
+!vite.config.js
+!tailwind.config.js
+!*.cjs
+!check.js
+!dbCheck.js
+!generate_landing.cjs

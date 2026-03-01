@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #99ffda;
+  --color-primary-dark: #34d399;
+  --color-primary-hover: #7fecc9;
+  --color-background-light: #f8fcfa;
+  --color-background-dark: #0f231c;
+  --color-surface-light: #ffffff;
+  --color-surface-dark: #162e25;
+  --color-text-primary-light: #0c1d17;
+  --color-text-primary-dark: #e0f2eb;
+  --color-text-secondary-light: #45a17f;
+  --color-text-secondary-dark: #6dbca0;
+  --color-danger: #ff6b6b;
+  --color-danger-bg: #fff0f0;
+  --color-mint-green: #98FFD9;
+  --color-dark-navy: #0A2620;
+  --color-shift-green-bg: #E6FBF2;
+  --color-shift-green-text: #046C4E;
+  --color-nav-inactive: #047857;
+  --color-brand-navy: #0A3F2F;
+
+  --color-neutral-100: #e6f4ef;
+  --color-neutral-200: #cdeadf;
+  --color-neutral-600: #45a17f;
+  --color-neutral-800: #0c1d17;
+
+  --font-display: "Manrope", sans-serif;
+}
+
+@layer utilities {
+  .auth-card {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+  }
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  background: transparent;
+  bottom: 0;
+  color: transparent;
+  cursor: pointer;
+  height: auto;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto;
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined' !important;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
