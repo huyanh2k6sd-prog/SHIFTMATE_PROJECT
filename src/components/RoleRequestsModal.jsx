@@ -12,47 +12,23 @@ export function RoleRequestsModal({ isOpen, onClose, role }) {
         const fetchRequests = async () => {
             setLoading(true)
 
-            // 1. Fetch pending user_roles
-            const { data: urData, error: urError } = await supabase
-                .from('user_roles')
-                .select('id, user_id, status, created_at')
-                .eq('role_id', role.id)
-                .eq('status', 'pending')
-                .order('created_at', { ascending: false })
+            // Fetch pending user_roles using the secure RPC to bypass RLS and get enriched data
+            const { data, error } = await supabase.rpc('get_pending_role_requests', { p_role_id: role.id });
 
-            if (urError) {
-                console.error("Error fetching user_roles:", urError)
-                setLoading(false)
-                return
-            }
-
-            if (urData && urData.length > 0) {
-                const userIds = urData.map(ur => ur.user_id)
-
-                // 2. Fetch profiles for these users
-                const { data: profilesData, error: profilesError } = await supabase
-                    .from('profiles')
-                    .select('id, full_name, avatar_url')
-                    .in('id', userIds)
-
-                if (profilesError) {
-                    console.error("Error fetching profiles:", profilesError)
-                }
-
-                // 3. Merge profiles into requests
-                const profileMap = (profilesData || []).reduce((acc, p) => {
-                    acc[p.id] = p
-                    return acc
-                }, {})
-
-                const enrichedRequests = urData.map(ur => ({
-                    ...ur,
-                    profiles: profileMap[ur.user_id] || null
-                }))
-
-                setRequests(enrichedRequests)
-            } else {
+            if (error) {
+                console.error("Error fetching requests via RPC:", error)
                 setRequests([])
+            } else {
+                // The RPC returns enriched data already (id, user_id, status, created_at, full_name, avatar_url)
+                // We map them to the format expected by the UI (full_name and avatar_url inside 'profiles')
+                const formatted = (data || []).map(item => ({
+                    ...item,
+                    profiles: {
+                        full_name: item.full_name,
+                        avatar_url: item.avatar_url
+                    }
+                }))
+                setRequests(formatted)
             }
             setLoading(false)
         }
