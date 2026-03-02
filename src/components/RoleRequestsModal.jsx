@@ -12,18 +12,47 @@ export function RoleRequestsModal({ isOpen, onClose, role }) {
         const fetchRequests = async () => {
             setLoading(true)
 
-            // Fetch pending user_roles and join with profiles table
-            const { data, error } = await supabase
+            // 1. Fetch pending user_roles
+            const { data: urData, error: urError } = await supabase
                 .from('user_roles')
-                .select('id, user_id, status, created_at, profiles(full_name, avatar_url)')
+                .select('id, user_id, status, created_at')
                 .eq('role_id', role.id)
                 .eq('status', 'pending')
                 .order('created_at', { ascending: false })
 
-            if (data) {
-                setRequests(data)
-            } else if (error) {
-                console.error("Error fetching requests:", error)
+            if (urError) {
+                console.error("Error fetching user_roles:", urError)
+                setLoading(false)
+                return
+            }
+
+            if (urData && urData.length > 0) {
+                const userIds = urData.map(ur => ur.user_id)
+
+                // 2. Fetch profiles for these users
+                const { data: profilesData, error: profilesError } = await supabase
+                    .from('profiles')
+                    .select('id, full_name, avatar_url')
+                    .in('id', userIds)
+
+                if (profilesError) {
+                    console.error("Error fetching profiles:", profilesError)
+                }
+
+                // 3. Merge profiles into requests
+                const profileMap = (profilesData || []).reduce((acc, p) => {
+                    acc[p.id] = p
+                    return acc
+                }, {})
+
+                const enrichedRequests = urData.map(ur => ({
+                    ...ur,
+                    profiles: profileMap[ur.user_id] || null
+                }))
+
+                setRequests(enrichedRequests)
+            } else {
+                setRequests([])
             }
             setLoading(false)
         }

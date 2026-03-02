@@ -558,7 +558,7 @@ export default function LandingPage() {
                     e.preventDefault();
                     navigate('/auth', { state: { mode: 'signin' } });
                 };
-            } else if (text.includes('sign up') || text.includes('đăng ký') || text.includes('get started') || text.includes('bắt đầu')) {
+            } else if (text.includes('sign up') || text.includes('đăng ký') || text.includes('get started') || text.includes('bắt đầu') || text.includes('try now') || text.includes('thử ngay')) {
                 btn.onclick = (e) => {
                     e.preventDefault();
                     navigate('/auth', { state: { mode: 'signup' } });
