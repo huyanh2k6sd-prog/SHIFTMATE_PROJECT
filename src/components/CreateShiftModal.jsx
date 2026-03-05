@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { formatLocalDate } from '../utils/timeFormat'
+import { formatLocalDate, toISOStringWithOffset } from '../utils/timeFormat'
 
 export function CreateShiftModal({ isOpen, onClose, roleId, workspaceId, weekDays = [], onSuccess, onUndoableAction }) {
     const [shiftName, setShiftName] = useState('')
@@ -30,9 +30,7 @@ export function CreateShiftModal({ isOpen, onClose, roleId, workspaceId, weekDay
 
         // Combine date and time helper
         const getISOString = (d, t) => {
-            // Validate HH:mm regex roughly before creating date
-            const timeVal = /^\d{2}:\d{2}$/.test(t) ? `${t}:00` : t.length === 5 ? `${t}:00` : '00:00:00';
-            return new Date(`${d}T${timeVal}`).toISOString();
+            return toISOStringWithOffset(d, t);
         };
 
         try {

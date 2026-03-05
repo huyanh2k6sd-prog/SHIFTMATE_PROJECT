@@ -228,7 +228,7 @@ export function SwapShiftModal({ isOpen, onClose, currentShift, workspaceId }) {
                     user_id: uid,
                     type: 'swap_request',
                     title: `Swap Opportunity — ${requesterName}`,
-                    message: `${requesterName} wants to swap their shift "${currentShift.name}" (${currentShift.time}) for your shift ${shiftDetails}.`,
+                    message: `${requesterName} wants to swap their shift "${currentShift.name}" (${currentShift.originalDateStr}, ${currentShift.time}) for your shift ${shiftDetails}.`,
                     reference_id: shifts[0].requestId,
                     is_read: false,
                 });
@@ -245,7 +245,7 @@ export function SwapShiftModal({ isOpen, onClose, currentShift, workspaceId }) {
                 user_id: m.user_id,
                 type: 'system',
                 title: `Swap Request — ${requesterName}`,
-                message: `${requesterName} has requested to swap their shift "${currentShift.name}" (${currentShift.time}). Waiting for an eligible colleague to accept.`,
+                message: `${requesterName} has requested to swap their shift "${currentShift.name}" (${currentShift.originalDateStr}, ${currentShift.time}). \n\nReason: "${swapReason}"\n\nWaiting for an eligible colleague to accept.`,
                 reference_id: requests?.[0]?.id || null,
                 is_read: false,
             }));
@@ -254,6 +254,16 @@ export function SwapShiftModal({ isOpen, onClose, currentShift, workspaceId }) {
             if (allNotifs.length > 0) {
                 await supabase.from('notifications').insert(allNotifs);
             }
+
+            // Notify the requester that their swap request was sent
+            await supabase.from('notifications').insert({
+                user_id: user.id,
+                type: 'system',
+                title: 'Swap Request Sent ✉️',
+                message: `Your swap request for shift "${currentShift.name}" (${currentShift.originalDateStr}, ${currentShift.time}) has been sent to eligible colleagues.`,
+                reference_id: requests?.[0]?.id || null,
+                is_read: false,
+            });
 
             setSubmitSuccess(true);
             setTimeout(() => {

@@ -74,8 +74,28 @@ export function UserProfileSection({ name, role = "", workspaceRoleName }) {
                 .limit(20);
 
             if (!error && data) {
-                setNotifications(data);
-                setUnreadCount(data.filter(n => !n.is_read).length);
+                // Enrich swap_request notifications with offer count
+                const enriched = await Promise.all(data.map(async (notif) => {
+                    if (notif.type === 'swap_request' && notif.reference_id && !notif.message?.includes('no longer valid') && !notif.message?.includes('✅') && !notif.message?.includes('❌')) {
+                        try {
+                            const { data: baseReq } = await supabase.from('shift_requests')
+                                .select('shift_id, requester_id')
+                                .eq('id', notif.reference_id).single();
+                            if (baseReq) {
+                                const { data: related } = await supabase.from('shift_requests')
+                                    .select('id')
+                                    .eq('shift_id', baseReq.shift_id)
+                                    .eq('requester_id', baseReq.requester_id)
+                                    .eq('type', 'swap')
+                                    .neq('status', 'completed');
+                                return { ...notif, _swapOfferCount: related?.length || 1 };
+                            }
+                        } catch (e) { /* ignore */ }
+                    }
+                    return notif;
+                }));
+                setNotifications(enriched);
+                setUnreadCount(enriched.filter(n => !n.is_read).length);
             }
             setLoadingNotifications(false);
         };
@@ -728,7 +748,7 @@ export function UserProfileSection({ name, role = "", workspaceRoleName }) {
                                                                     ) : (
                                                                         <span className="material-symbols-outlined text-sm">check</span>
                                                                     )}
-                                                                    {notif.type === 'swap_request' ? 'Select Swap Shift' : 'Accept'}
+                                                                    {notif.type === 'swap_request' ? (notif._swapOfferCount > 1 ? 'Select Swap Shift' : 'Accept') : 'Accept'}
                                                                 </button>
                                                                 <button
                                                                     onClick={(e) => { e.stopPropagation(); handleReject(notif); }}

@@ -80,6 +80,31 @@ export function RoleRequestsModal({ isOpen, onClose, role }) {
             console.error("Error sending approval notification:", notifError)
         }
 
+        // Update all related manager notifications to show 'Approved' status
+        try {
+            const { data: managerNotifs } = await supabase
+                .from('notifications')
+                .select('id, message')
+                .eq('reference_id', req.id)
+                .eq('type', 'role_request');
+
+            if (managerNotifs && managerNotifs.length > 0) {
+                for (const n of managerNotifs) {
+                    if (!n.message.includes('✅') && !n.message.includes('❌')) {
+                        await supabase
+                            .from('notifications')
+                            .update({
+                                is_read: true,
+                                message: n.message + ' ✅ Approved.'
+                            })
+                            .eq('id', n.id);
+                    }
+                }
+            }
+        } catch (err) {
+            console.error("Error updating manager notifications:", err);
+        }
+
         // Optimistic UI update
         setRequests(prev => prev.filter(r => r.id !== req.id))
         setProcessingId(null)
@@ -111,6 +136,31 @@ export function RoleRequestsModal({ isOpen, onClose, role }) {
 
         if (notifError) {
             console.error("Error sending rejection notification:", notifError)
+        }
+
+        // Update all related manager notifications to show 'Rejected' status
+        try {
+            const { data: managerNotifs } = await supabase
+                .from('notifications')
+                .select('id, message')
+                .eq('reference_id', req.id)
+                .eq('type', 'role_request');
+
+            if (managerNotifs && managerNotifs.length > 0) {
+                for (const n of managerNotifs) {
+                    if (!n.message.includes('✅') && !n.message.includes('❌')) {
+                        await supabase
+                            .from('notifications')
+                            .update({
+                                is_read: true,
+                                message: n.message + ' ❌ Rejected.'
+                            })
+                            .eq('id', n.id);
+                    }
+                }
+            }
+        } catch (err) {
+            console.error("Error updating manager notifications:", err);
         }
 
         // Optimistic UI update

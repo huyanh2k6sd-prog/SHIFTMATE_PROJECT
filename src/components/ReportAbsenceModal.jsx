@@ -74,7 +74,7 @@ export function ReportAbsenceModal({ isOpen, onClose, currentShift, workspaceId 
                 user_id: m.user_id,
                 type: 'absence_request',
                 title: `Absence Request — ${requesterName}`,
-                message: `${requesterName} wants to report absence for shift "${currentShift.name}" (${currentShift.time}, ${currentShift.duration}). Reason: "${absenceReason}"`,
+                message: `${requesterName} has reported an absence for shift "${currentShift.name}" (${currentShift.time}). \n\nReason: "${absenceReason}"`,
                 reference_id: request?.id || null,
                 is_read: false,
             }));
@@ -85,6 +85,16 @@ export function ReportAbsenceModal({ isOpen, onClose, currentShift, workspaceId 
                 const { error: insertErr } = await supabase.from('notifications').insert(managerNotifs);
                 if (insertErr) console.error("Error inserting absence notifs:", insertErr);
             }
+
+            // Notify the requester that their request was sent
+            await supabase.from('notifications').insert({
+                user_id: user.id,
+                type: 'system',
+                title: 'Absence Request Sent ✉️',
+                message: `Your absence request for shift "${currentShift.name}" (${currentShift.originalDateStr}, ${currentShift.time}) has been sent to managers for approval.`,
+                reference_id: request?.id || null,
+                is_read: false,
+            });
 
             setSubmitSuccess(true);
             setTimeout(() => {

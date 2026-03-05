@@ -157,7 +157,7 @@ export function AllNotificationsModal({ isOpen, onClose, unreadCount = 0, onMark
                                                             ) : (
                                                                 <span className="material-symbols-outlined text-lg">check</span>
                                                             )}
-                                                            {notif.type === 'swap_request' ? 'Select Swap Shift' : 'Accept'}
+                                                            {notif.type === 'swap_request' ? (notif._swapOfferCount > 1 ? 'Select Swap Shift' : 'Accept') : 'Accept'}
                                                         </button>
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); onReject?.(notif); }}

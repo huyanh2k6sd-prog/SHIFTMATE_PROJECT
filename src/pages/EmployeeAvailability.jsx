@@ -257,46 +257,80 @@ export function EmployeeAvailability() {
         setSaving(false);
     };
 
-    const handleClearAll = async () => {
-        setSaving(true);
+    const handleClearAll = () => {
         setSelectedShifts(new Set());
-        const { error } = await saveAvailabilityRecords(new Set());
-        if (error) {
-            console.error("Error clearing:", error);
-            alert("Failed to clear availability.");
-            setSaving(false);
-        } else {
-            alert("Cleared successfully!");
-            setSaving(false);
-        }
     };
 
     const handleCopyLastWeek = async () => {
         setSaving(true);
         try {
             const lastWeekDates = getWeekDates(currentWeekOffset - 1);
+
+            // Get user's approved role IDs
+            const { data: userRolesData } = await supabase
+                .from('user_roles')
+                .select('role_id')
+                .eq('user_id', user.id)
+                .eq('status', 'approved');
+
+            const roleIds = (userRolesData || []).map(ur => ur.role_id);
+            if (roleIds.length === 0) {
+                alert('No approved roles found.');
+                setSaving(false);
+                return;
+            }
+
+            // Fetch last week's shifts for comparison
+            const { data: lastWeekShifts } = await supabase
+                .from('shifts')
+                .select('id, name, date, start_time, end_time, role_id')
+                .in('role_id', roleIds)
+                .gte('date', lastWeekDates[0].dateStr)
+                .lte('date', lastWeekDates[6].dateStr)
+                .order('date')
+                .order('start_time');
+
+            // Compare shifts: build a "signature" for each week (day-of-week + time + role)
+            const buildSignature = (shifts) => {
+                return shifts.map(s => {
+                    const d = new Date(s.date);
+                    return `${d.getDay()}_${formatTime(s.start_time)}_${formatTime(s.end_time)}_${s.role_id}`;
+                }).sort().join('|');
+            };
+
+            const thisWeekShifts = Object.values(shiftsByDay).flat();
+            const lastSig = buildSignature(lastWeekShifts || []);
+            const thisSig = buildSignature(thisWeekShifts);
+
+            if (lastSig !== thisSig) {
+                alert('Cannot copy: shifts have been changed by the manager compared to last week.');
+                setSaving(false);
+                return;
+            }
+
+            // Fetch last week's availabilities
             const { data: lastWeekAvail, error } = await supabase
                 .from('availabilities')
                 .select('*')
                 .eq('user_id', user.id)
+                .in('role_id', roleIds)
                 .gte('date', lastWeekDates[0].dateStr)
                 .lte('date', lastWeekDates[6].dateStr);
 
             if (error) throw error;
             if (!lastWeekAvail || lastWeekAvail.length === 0) {
-                alert("No availability found for last week.");
+                alert('No availability found for last week.');
                 setSaving(false);
                 return;
             }
 
-            const allKnownShiftsThisWeek = Object.values(shiftsByDay).flat();
-            const newSelected = new Set(); // Overwrites existing
-
+            // Map last week's availabilities to this week's shift IDs
+            const newSelected = new Set();
             lastWeekAvail.forEach(oldAvail => {
                 const oldDateObj = new Date(oldAvail.date);
                 const dayOfWeek = oldDateObj.getDay();
 
-                const matchingShift = allKnownShiftsThisWeek.find(s => {
+                const matchingShift = thisWeekShifts.find(s => {
                     const sDateObj = new Date(s.date);
                     return sDateObj.getDay() === dayOfWeek &&
                         formatTime(s.start_time) === formatTime(oldAvail.start_time) &&
@@ -311,17 +345,13 @@ export function EmployeeAvailability() {
 
             if (newSelected.size > 0) {
                 setSelectedShifts(newSelected);
-                const { error: saveErr } = await saveAvailabilityRecords(newSelected);
-                if (saveErr) throw saveErr;
-
-                const unlockTime = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
-                alert("Copied successfully! This week is now locked for 5 days.");
+                alert('Copied last week\'s availability! Click "Save Availability" to confirm.');
             } else {
-                alert("Could not find matching shifts in the current week to copy to.");
+                alert('Could not find matching shifts in the current week to copy to.');
             }
         } catch (error) {
-            console.error("Error copying last week:", error);
-            alert("Failed to copy last week's availability.");
+            console.error('Error copying last week:', error);
+            alert('Failed to copy last week\'s availability.');
         }
         setSaving(false);
     };

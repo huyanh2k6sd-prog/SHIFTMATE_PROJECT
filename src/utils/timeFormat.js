@@ -118,3 +118,13 @@ export const parseVietnamDateTime = (dateStr, timeStr) => {
     const cleanTime = timeStr.substring(0, 5);
     return new Date(`${dateStr}T${cleanTime}:00+07:00`);
 };
+
+/**
+ * Returns an ISO string with +07:00 offset for a given date and HH:mm time.
+ * This ensures the database stores the local time correctly without shifting 7 hours.
+ */
+export const toISOStringWithOffset = (dateStr, timeStr) => {
+    if (!dateStr || !timeStr) return null;
+    const cleanTime = timeStr.substring(0, 5);
+    return `${dateStr}T${cleanTime}:00+07:00`;
+};

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import { toISOStringWithOffset } from '../utils/timeFormat'
 
 export function EditShiftModal({ isOpen, onClose, shiftData, onSuccess, onUndoableAction }) {
     const [shiftName, setShiftName] = useState('')
@@ -53,8 +54,8 @@ export function EditShiftModal({ isOpen, onClose, shiftData, onSuccess, onUndoab
 
                 // Update each shift with correct date-specific timestamps
                 const updates = groupShifts.map(gs => {
-                    const startDateTime = new Date(`${gs.date}T${formattedStartTime}`).toISOString();
-                    const endDateTime = new Date(`${gs.date}T${formattedEndTime}`).toISOString();
+                    const startDateTime = toISOStringWithOffset(gs.date, startTime);
+                    const endDateTime = toISOStringWithOffset(gs.date, endTime);
                     return supabase
                         .from('shifts')
                         .update({
@@ -76,8 +77,8 @@ export function EditShiftModal({ isOpen, onClose, shiftData, onSuccess, onUndoab
                 if (singleShift) originalShiftsData = [singleShift];
 
                 // Single shift update
-                const startDateTime = new Date(`${date}T${formattedStartTime}`).toISOString();
-                const endDateTime = new Date(`${date}T${formattedEndTime}`).toISOString();
+                const startDateTime = toISOStringWithOffset(date, startTime);
+                const endDateTime = toISOStringWithOffset(date, endTime);
 
                 const { error } = await supabase
                     .from('shifts')

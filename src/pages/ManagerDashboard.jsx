@@ -215,18 +215,14 @@ export function ManagerDashboard() {
                     return temp.getDay() === dayOfWeek;
                 })?.fullDate;
 
-                const adjustTime = (dtStr, oldDate, newDate) => {
+                const adjustTime = (dtStr) => {
                     if (!dtStr) return null;
-                    const d = new Date(dtStr);
-                    const baseOld = new Date(`${oldDate}T00:00:00`);
-                    const baseNew = new Date(`${newDate}T00:00:00`);
 
-                    const diffTime = Math.round((d.getTime() - baseOld.getTime()) / (1000 * 60 * 60 * 24)); // Days diff
-                    // Even simpler: just replace hours and mins onto the target date + offset
-                    const targetDate = new Date(baseNew);
-                    targetDate.setDate(targetDate.getDate() + (diffTime >= 0 ? diffTime : 0));
+                    // Use formatTime to get the correct local HH:mm (handles UTC→local conversion)
+                    const localTime = formatTime(dtStr); // returns "HH:mm"
 
-                    return new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), d.getHours(), d.getMinutes(), 0).toISOString();
+                    // Return new ISO string with +07:00 offset for the new date
+                    return `${newDateStr}T${localTime}:00+07:00`;
                 };
 
                 return {
@@ -236,8 +232,8 @@ export function ManagerDashboard() {
                     workspace_id: workspaceId,
                     group_id: crypto.randomUUID(),
                     date: newDateStr,
-                    start_time: adjustTime(oldShift.start_time, oldShift.date, newDateStr),
-                    end_time: adjustTime(oldShift.end_time, oldShift.date, newDateStr),
+                    start_time: adjustTime(oldShift.start_time),
+                    end_time: adjustTime(oldShift.end_time),
                     required_staff: oldShift.required_staff || 3
                 };
             }).filter(s => s.date);
