@@ -37,12 +37,12 @@ export function ManagerHeader() {
     return (
         <header className="flex-shrink-0 h-16 bg-[#ffffff] dark:bg-[#162e25] border-b border-[#99ffda]/20 flex items-center justify-between px-6 z-20 w-full relative">
             <div className="flex items-center gap-2 flex-shrink-0">
-                <button onClick={() => navigate('/workspace')} className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-center text-slate-600 dark:text-slate-300" aria-label="Go back">
+                <button onClick={() => navigate(`/manager/roles/${workspaceId}`)} className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-center text-slate-600 dark:text-slate-300" aria-label="Go back">
                     <span className="material-symbols-outlined text-[18px]">arrow_back_ios_new</span>
                 </button>
                 <div className="w-[1px] h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div>
                 <div
-                    onClick={() => navigate('/workspace')}
+                    onClick={() => navigate(`/manager/roles/${workspaceId}`)}
                     className="flex items-baseline whitespace-nowrap cursor-pointer hover:opacity-80 transition-opacity"
                 >
                     <span className="text-2xl font-black tracking-tight bg-gradient-to-r from-text-primary-light to-[#45a17f] dark:from-white dark:to-primary bg-clip-text text-transparent">ShiftMate</span>

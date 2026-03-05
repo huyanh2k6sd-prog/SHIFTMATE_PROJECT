@@ -117,6 +117,15 @@ export function WorkspaceSelection() {
     }
 
     const handleLeaveWorkspace = async (ws) => {
+        // Fetch managers BEFORE leaving (user loses membership after RPC)
+        const { data: managers } = await supabase
+            .from('workspace_members')
+            .select('user_id')
+            .eq('workspace_id', ws.id)
+            .in('role', ['manager', 'MANAGER']);
+
+        const employeeName = user?.user_metadata?.full_name || 'An employee';
+
         // Call the secure RPC to completely wipe all this user's data 
         // (availabilities, shifts, requests, roles) from this specific workspace.
         const { error } = await supabase.rpc('leave_workspace_completely', {
@@ -124,6 +133,18 @@ export function WorkspaceSelection() {
         });
 
         if (!error) {
+            // Notify managers that this employee left
+            const managerNotifs = (managers || []).map(m => ({
+                user_id: m.user_id,
+                type: 'system',
+                title: 'Employee Left Workspace 👋',
+                message: `${employeeName} has left the workspace "${ws.name}".`,
+                is_read: false,
+            }));
+            if (managerNotifs.length > 0) {
+                await supabase.from('notifications').insert(managerNotifs);
+            }
+
             setDeleteConfirm(null)
             fetchWorkspaces()
         } else {

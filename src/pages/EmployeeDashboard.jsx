@@ -101,9 +101,9 @@ export function EmployeeDashboard() {
 
                 setAssignedShifts(filteredShifts);
 
-                // Calculate total hours
+                // Calculate total hours from filtered (upcoming only) shifts
                 let hours = 0;
-                formattedShifts.forEach(s => {
+                filteredShifts.forEach(s => {
                     hours += getDurationHours(s.start_time, s.end_time);
                 });
                 setTotalHours(Math.round(hours * 100) / 100);

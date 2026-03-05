@@ -193,14 +193,7 @@ export function ManagerSettings() {
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
                             </div>
-                            <div className="flex items-center gap-2">
-                                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Sort by:</span>
-                                <select className="bg-transparent border-none text-sm font-medium text-slate-700 dark:text-slate-200 focus:ring-0 cursor-pointer hover:text-primary">
-                                    <option>Name (A-Z)</option>
-                                    <option>Highest Wage</option>
-                                    <option>Lowest Wage</option>
-                                </select>
-                            </div>
+
                         </div>
 
                         <div className="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
