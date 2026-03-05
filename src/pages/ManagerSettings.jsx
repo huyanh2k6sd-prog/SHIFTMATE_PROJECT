@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { ManagerHeader } from '../components/ManagerHeader'
 import { RoleRequestsModal } from '../components/RoleRequestsModal'
@@ -33,6 +33,7 @@ const getRoleDetails = (name) => {
 
 export function ManagerSettings() {
     const { workspaceId } = useParams()
+    const navigate = useNavigate()
     const [roles, setRoles] = useState([])
     const [pendingCounts, setPendingCounts] = useState({})
     const [loading, setLoading] = useState(true)
@@ -226,7 +227,7 @@ export function ManagerSettings() {
                                             </tr>
                                         ) : (
                                             filteredRoles.map(role => (
-                                                <tr key={role.id} onClick={() => window.location.href = `/manager/dashboard/${workspaceId}/${role.id}`} className="group hover:bg-primary-light/30 dark:hover:bg-primary-dark/20 transition-colors cursor-pointer">
+                                                <tr key={role.id} onClick={() => navigate(`/manager/dashboard/${workspaceId}/${role.id}`)} className="group hover:bg-primary-light/30 dark:hover:bg-primary-dark/20 transition-colors cursor-pointer">
                                                     <td className="px-6 py-4">
                                                         <div className="flex items-center gap-3">
                                                             <div className={`shrink-0 w-8 h-8 rounded-full bg-${(role.color_theme || 'blue').replace('bg-', '')}-50 dark:bg-${(role.color_theme || 'blue').replace('bg-', '')}-900/30 flex items-center justify-center text-${(role.color_theme || 'blue').replace('bg-', '')}-600 dark:text-${(role.color_theme || 'blue').replace('bg-', '')}-400`}>
