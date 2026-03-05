@@ -49,7 +49,7 @@ export function UserProfileSection({ name, role = "", workspaceRoleName }) {
     const formatRoleName = (roleStr) => {
         if (!roleStr) return null;
         return (
-            <span className="text-sm font-bold tracking-tight text-teal-700 dark:text-[#98FFD9]">
+            <span className="text-sm font-bold tracking-tight text-teal-700 dark:text-[#98FFD9] break-words leading-tight">
                 {roleStr}
             </span>
         )
@@ -659,7 +659,7 @@ export function UserProfileSection({ name, role = "", workspaceRoleName }) {
     };
 
     return (
-        <div className="flex items-center gap-2 sm:gap-4 justify-end">
+        <div className="flex items-center gap-2 sm:gap-4 justify-end flex-shrink-0">
             <div className="relative">
                 <button
                     onClick={() => setIsNotificationsDropdownOpen(!isNotificationsDropdownOpen)}
@@ -790,16 +790,16 @@ export function UserProfileSection({ name, role = "", workspaceRoleName }) {
             </div>
 
             {workspaceRoleName && (
-                <div className="hidden sm:block ml-2 mr-2">
+                <div className="hidden sm:block ml-2 mr-2 max-w-[120px]">
                     {formatRoleName(workspaceRoleName)}
                 </div>
             )}
 
             <div className="flex items-center gap-3 ml-1 sm:ml-2">
-                <div className="hidden sm:flex flex-col items-end justify-center">
-                    <span className="text-sm font-bold text-black dark:text-white leading-tight whitespace-nowrap">{displayName}</span>
+                <div className="hidden sm:flex flex-col items-end justify-center max-w-[140px]">
+                    <span className="text-sm font-bold text-black dark:text-white leading-tight text-right">{displayName}</span>
                     {role && (
-                        <span className="text-xs font-normal text-[#059669] dark:text-[#34d399] capitalize whitespace-nowrap">{role}</span>
+                        <span className="text-xs font-normal text-[#059669] dark:text-[#34d399] capitalize text-right">{role}</span>
                     )}
                 </div>
                 <button

@@ -78,7 +78,7 @@ export function EmployeeHeader() {
                 </Link>
             </nav>
 
-            <div className="flex items-center gap-4 w-48 justify-end">
+            <div className="flex items-center gap-4 justify-end flex-shrink-0">
                 <UserProfileSection role="Employee" workspaceRoleName={roleName} />
             </div>
         </header>
